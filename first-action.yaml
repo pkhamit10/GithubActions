@@ -1,0 +1,43 @@
+name: Python Add Two Numbers
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13.7'
+
+      - name: Create add.py
+        run: |
+          cat > add.py << 'PY'
+          import os
+          def add(a, b):
+              return a + b
+          if __name__ == "__main__":
+              a = float(os.environ.get("A", "2"))
+              b = float(os.environ.get("B", "3"))
+              # print integer if both inputs are integers
+              if a.is_integer() and b.is_integer():
+                  print(int(add(int(a), int(b))))
+              else:
+                  print(add(a, b))
+          PY
+
+      - name: Run add.py (defaults)
+        run: python add.py
+
+      - name: Run add.py (with inputs)
+        env:
+          A: 5
+          B: 7
+        run: python add.py
